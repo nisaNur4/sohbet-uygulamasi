@@ -1,0 +1,276 @@
+{
+    "info": {
+      "name": "MERN Chat API Testleri (Otomatik)",
+      "_postman_id": "mern-chat-app-collection-001",
+      "description": "MERN Chat App için tam otomatik, iki kullanıcı ile tüm ana API endpoint'lerini kapsayan test koleksiyonu.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Kullanıcı Kayıt 1 (Başarılı)",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Test User 1\",\n  \"email\": \"testuser1_{{$timestamp}}@example.com\",\n  \"password\": \"123456\"\n}"
+          },
+          "url": { "raw": "http://localhost:5000/api/user", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "user"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var jsonData = pm.response.json();",
+                "pm.environment.set(\"user1_id\", jsonData._id);",
+                "pm.environment.set(\"user1_email\", jsonData.email);"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kullanıcı Kayıt 2 (Başarılı)",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Test User 2\",\n  \"email\": \"testuser2_{{$timestamp}}@example.com\",\n  \"password\": \"123456\"\n}"
+          },
+          "url": { "raw": "http://localhost:5000/api/user", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "user"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var jsonData = pm.response.json();",
+                "pm.environment.set(\"user2_id\", jsonData._id);",
+                "pm.environment.set(\"user2_email\", jsonData.email);"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kullanıcı Giriş 1 (Başarılı)",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"email\": \"{{user1_email}}\",\n  \"password\": \"123456\"\n}"
+          },
+          "url": { "raw": "http://localhost:5000/api/user/login", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "user", "login"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var jsonData = pm.response.json();",
+                "pm.environment.set(\"token\", jsonData.token);"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kullanıcı Arama (Başarılı)",
+        "request": {
+          "method": "GET",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{token}}" }
+          ],
+          "url": {
+            "raw": "http://localhost:5000/api/user?search=Test",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["api", "user"],
+            "query": [{ "key": "search", "value": "Test" }]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 200\", function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "pm.test(\"Response is array\", function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(Array.isArray(jsonData)).to.be.true;",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sohbet Başlat (Başarılı)",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" },
+            { "key": "Authorization", "value": "Bearer {{token}}" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"userId\": \"{{user2_id}}\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:5000/api/chat",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["api", "chat"]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 200\", function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "pm.test(\"Response has _id\", function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property(\"_id\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kullanıcı Kayıt (Başarısız - Eksik Alan)",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Eksik User\"\n}"
+          },
+          "url": { "raw": "http://localhost:5000/api/user", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "user"] }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 400\", function () {",
+                "    pm.response.to.have.status(400);",
+                "});",
+                "pm.test(\"Response has error message\", function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property(\"message\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kullanıcı Giriş (Başarısız - Yanlış Şifre)",
+        "request": {
+          "method": "POST",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"email\": \"testuser1@example.com\",\n  \"password\": \"yanlisSifre\"\n}"
+          },
+          "url": { "raw": "http://localhost:5000/api/user/login", "protocol": "http", "host": ["localhost"], "port": "5000", "path": ["api", "user", "login"] }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 401\", function () {",
+                "    pm.response.to.have.status(401);",
+                "});",
+                "pm.test(\"Response has error message\", function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(jsonData).to.have.property(\"message\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Kullanıcı Arama (Başarısız - Token Yok)",
+        "request": {
+          "method": "GET",
+          "url": {
+            "raw": "http://localhost:5000/api/user?search=Test",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["api", "user"],
+            "query": [{ "key": "search", "value": "Test" }]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 401\", function () {",
+                "    pm.response.to.have.status(401);",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sohbetleri Listele (Başarılı)",
+        "request": {
+          "method": "GET",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{token}}" }
+          ],
+          "url": {
+            "raw": "http://localhost:5000/api/chat",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "5000",
+            "path": ["api", "chat"]
+          }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status code is 200\", function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "pm.test(\"Response is array\", function () {",
+                "    var jsonData = pm.response.json();",
+                "    pm.expect(Array.isArray(jsonData)).to.be.true;",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,25 @@
+config:
+  # Test edilecek API'nin ana adresi. Backend'in çalıştığı portu (5000) hedef alıyoruz.
+  target: "http://localhost:5000/api"
+  # Testin aşamalarını belirliyoruz. Bu, saldırıyı daha gerçekçi kılar.
+  phases:
+    # Faz 1: Yükü yavaşça artırarak sunucuyu ısıtma (Warm-up)
+    - duration: 15
+      arrivalRate: 5 # Saniyede 5 istek ile başla
+      rampTo: 50 # 15 saniye sonunda saniyede 50 isteğe ulaş
+      name: "Isınma Aşaması"
+    # Faz 2: Belirlenen en yüksek yükte sabit bir süre test etme (Saldırı)
+    - duration: 60
+      arrivalRate: 100 # 60 saniye boyunca saniyede sabit 100 istek gönder
+      name: "Yüksek Yük Aşaması"
+
+# Test senaryolarını tanımlıyoruz.
+scenarios:
+  - name: "Kullanıcı arama endpoint'ine sürekli istek gönder"
+    flow:
+      # Bu senaryo, kullanıcı arama API'sine GET isteği gönderir.
+      # Bu endpoint korumalı olduğu için, isteklerin çoğu 401 (Yetkisiz) hatası alacaktır.
+      # Bu durum, sunucunun yetkisiz isteklere ne kadar hızlı yanıt verdiğini
+      # ve bu yük altında çöküp çökmediğini test etmek için idealdir.
+      - get:
+          url: "/user?search=test"
