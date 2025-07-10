@@ -1,7 +1,5 @@
 Talk-A-Tive, gerçek zamanlı sohbet için Socket.io kullanan ve kullanıcı bilgilerini MongoDB veri tabanında şifreli olarak saklayan bir sohbet uygulamasıdır.
 
-Teknoloji Yığını
-
 İstemci: React JS
 Sunucu: Node JS, Express JS
 Veri tabanı: MongoDB
@@ -14,7 +12,6 @@ Bağımlılıkların Yüklenmesi
   npm install
 
 Uygulamayı Başlatma
-
 Sunucuyu Başlatma
 
   npm run start
